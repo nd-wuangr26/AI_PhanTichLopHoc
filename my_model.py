@@ -1,35 +1,64 @@
-import onnxruntime as ort
-import numpy as np
+import torch
 import cv2
+import numpy as np
+from load_resnet18 import load_model
+from torchvision import transforms
+from ultralytics import YOLO
 
-# Load ONNX model
-session = ort.InferenceSession("model/best.onnx")
+# --- Cấu hình ---
+YOLO_MODEL_PATH = 'model_detection/best.pt'
+CLASSIFIER_MODEL_PATH = 'model_classification/best.pt'
+CLASS_NAMES = ['study', 'sleep', 'other']
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# Gán kích thước đầu vào cố định (tùy theo model bạn dùng)
-input_width = 640
-input_height = 640
+# --- Load YOLO ---
+yolo_model = YOLO(YOLO_MODEL_PATH)
+yolo_model = yolo_model.to(device)
+yolo_model.eval()
+yolo_imgsz = 640
 
-input_name = session.get_inputs()[0].name
+# --- Load classification model ---
+cls_model = load_model(CLASSIFIER_MODEL_PATH, device, num_classes=len(CLASS_NAMES))
+cls_model.eval()
 
-names = ['study', 'sleep', 'other']  # hoặc tùy theo mô hình của bạn
+# --- Preprocessing classification ---
+preprocess_cls = transforms.Compose([
+    transforms.ToPILImage(),
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225])
+])
 
-def preprocess(frame):
-    img = cv2.resize(frame, (input_width, input_height))
-    img = img / 255.0
-    img = img.transpose(2, 0, 1)  # HWC → CHW
-    img = np.expand_dims(img, axis=0).astype(np.float32)
-    return img
+def preprocess_classification(crop):
+    img_rgb = cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)
+    tensor = preprocess_cls(img_rgb)
+    return tensor.unsqueeze(0).to(device)
 
-def load_model_and_predict(frame):
-    input_tensor = preprocess(frame)
-    outputs = session.run(None, {input_name: input_tensor})
-    detections = outputs[0][0]  # Tùy định dạng ONNX đầu ra của bạn
+def detect_and_classify(frame):
+    img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    results = yolo_model(img, imgsz=640)  # Resize về 640x640
+    detections = results[0].boxes.xyxy.cpu().numpy()
 
-    labels = []
+    results_list = []
     for det in detections:
-        conf = det[4]
-        class_id = int(det[5])
-        print(f"class_id: {class_id}, names length: {len(names)}")  # Debug
-        if conf > 0.5:
-            labels.append(names[class_id])
-    return labels
+        x1, y1, x2, y2, conf, cls = det
+        if int(cls) != 0 or conf < 0.5:  # chỉ nhận người
+            continue
+
+        x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])
+        person_crop = frame[y1:y2, x1:x2]
+        if person_crop.size == 0:
+            continue
+
+        cls_input_tensor = preprocess_classification(person_crop)
+        with torch.no_grad():
+            output = cls_model(cls_input_tensor)
+            class_id = int(torch.argmax(output, dim=1).item())
+
+        results_list.append({
+            "box": (x1, y1, x2, y2),
+            "label": CLASS_NAMES[class_id]
+        })
+
+    return results_list

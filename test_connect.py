@@ -5,7 +5,7 @@ from mysql.connector import Error
 DB_CONFIG = {
     'host': '127.0.0.1',  # Địa chỉ máy chủ MySQL
     'user': 'root',  # Tên người dùng (thay đổi nếu cần)
-    'password': '123456',  # Mật khẩu (thay đổi)
+    'password': '123',  # Mật khẩu (thay đổi)
     'database': 'class_db'  # Tên database
 }
 

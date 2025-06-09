@@ -4,12 +4,10 @@ import numpy as np
 import mysql.connector
 from mysql.connector import Error
 from datetime import datetime
-import threading
 import time
 from flask import jsonify
 from collections import Counter
-from my_model import load_model_and_predict
-
+from my_model import detect_and_classify
 
 app = Flask(__name__)
 camera = cv2.VideoCapture("test.mp4")
@@ -78,16 +76,16 @@ def generate_frames():
     while True:
         success, frame = camera.read()
         if not success:
-            break
+            camera.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            continue
 
         frame_count += 1
         if frame_count < frame_interval:
             continue  # bỏ qua frame, chưa đến 1s
         frame_count = 0  # reset đếm
 
-
         # Thực hiện inference
-        labels = load_model_and_predict(frame)
+        labels = detect_and_classify(frame)
         counts = Counter(labels)
 
         counter.study_count = counts.get("study", 0)
