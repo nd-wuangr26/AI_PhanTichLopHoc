@@ -47,7 +47,7 @@ AI_PhanTichLopHoc/
 ```
 ## Yêu cầu
 
-- Python 3.7+
+- Python 3.10
 - MySQL
 - Các thư viện Python (xem `requirements.txt`):
   - Flask
