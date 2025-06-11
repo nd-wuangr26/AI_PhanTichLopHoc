@@ -1,0 +1,8 @@
+Flask
+torch
+torchvision
+opencv-python
+numpy
+Pillow
+ultralytics==8.0.206
+mysql-connector-python

@@ -1,13 +1,12 @@
 from flask import Flask, render_template, Response
 import cv2
-import numpy as np
 import mysql.connector
 from mysql.connector import Error
 from datetime import datetime
 import time
 from flask import jsonify
 from collections import Counter
-from my_model import detect_and_classify
+from utils.my_model import detect_and_classify
 
 app = Flask(__name__)
 camera = cv2.VideoCapture("test.mp4")
@@ -61,7 +60,7 @@ class DetectionCounter:
         self.sleep_count = 0
         self.other_count = 0
         self.last_save_time = time.time()
-        self.save_interval = 1  # Lưu dữ liệu mỗi 5 giây
+        self.save_interval = 3  # Lưu dữ liệu mỗi 5 giây
 
 
 counter = DetectionCounter()
@@ -86,11 +85,13 @@ def generate_frames():
 
         # Thực hiện inference
         labels = detect_and_classify(frame)
-        counts = Counter(labels)
+        only_labels = [item['label'] for item in labels]
+        counts = Counter(only_labels)
+        print("Kết quả phân loại:", counts)
 
-        counter.study_count = counts.get("study", 0)
-        counter.sleep_count = counts.get("sleep", 0)
-        counter.other_count = counts.get("other", 0)
+        counter.study_count += counts.get("study", 0)
+        counter.sleep_count += counts.get("sleep", 0)
+        counter.other_count += counts.get("other", 0)
 
         # Lưu DB nếu đã đủ 5 giây
         current_time = time.time()
