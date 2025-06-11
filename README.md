@@ -70,6 +70,14 @@ CREATE TABLE detections (
 
 1. Clone repository:
    ```bash
-   git clone https://github.com/your-repo/AI_PhanTichLopHoc.git
-   cd AI_PhanTichLopHoc
+     git clone https://github.com/your-repo/AI_PhanTichLopHoc.git
+     cd AI_PhanTichLopHoc
+   ```
 2. Chạy file Docker
+  ```bash
+    # Build Docker image
+    docker build -t flask-class-monitor
+
+    # Run Docker container
+    docker run -p 5000:5000 flask-class-monitor
+  ```
