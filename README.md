@@ -6,7 +6,7 @@ AI_PhanTichLopHoc là một ứng dụng dựa trên Flask, sử dụng các mô
 
 - **Phân tích video theo thời gian thực**: 
   - Xử lý từng khung hình từ video để phân loại hành vi (học tập, ngủ, hoạt động khác).
-  - Sử dụng mô hình ONNX hoặc PyTorch để dự đoán.
+  - Sử dụng mô hình PyTorch để dự đoán.
 
 - **Lưu trữ dữ liệu**:
   - Lưu kết quả phân tích vào cơ sở dữ liệu MySQL.
