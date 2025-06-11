@@ -29,18 +29,16 @@ AI_PhanTichLopHoc là một ứng dụng dựa trên Flask, sử dụng các mô
 ```yaml
 AI_PhanTichLopHoc/
 ├── app.py                # Ứng dụng Flask chính sử dụng mô hình PyTorch
-├── app_onnx.py           # Ứng dụng Flask sử dụng mô hình ONNX Runtime
-├── my_model.py           # Logic tải và dự đoán với mô hình PyTorch
-├── my_model_onnx.py      # Logic tải và dự đoán với mô hình ONNX
-├── test_connect.py       # Script kiểm tra kết nối MongoDB
+├── test_connect.py       # Script kiểm tra kết nối MySQL
 ├── test_frame.jpg        # Hình ảnh mẫu để kiểm tra mô hình
 ├── test.mp4              # Video mẫu để kiểm tra mô hình
-├── test.py               # Unit tests cho ứng dụng
-├── model/
+├── model_classification/
 │   ├── best.pt           # Mô hình PyTorch đã huấn luyện
-│   └── best.onnx         # Mô hình ONNX đã chuyển đổi
+├── model_detection/
+│   ├── best.pt           # Mô hình PyTorch đã huấn luyện
 ├── static/
-│   └── style.css         # File CSS cho giao diện web
+│   └── css
+|        └── style.css         # File CSS cho giao diện web
 ├── templates/
 │   └── index.html        # Template HTML của giao diện web
 └── .idea/                # Cấu hình IDE (PyCharm hoặc tương tự)
@@ -53,8 +51,8 @@ AI_PhanTichLopHoc/
   - Flask
   - OpenCV
   - MySQL Connector
-  - ONNX Runtime (cho mô hình ONNX)
   - Ultralytics (cho mô hình PyTorch)
+  - Sử dụng Pytorch để load model Resnet và YOLO
 ## Tạo bảng cơ sở dữ liệu (SQL - tùy chọn)
 
 Nếu bạn sử dụng **MySQL** (hoặc một hệ quản trị cơ sở dữ liệu quan hệ khác) để lưu trữ dữ liệu trạng thái sinh viên, hãy tạo bảng theo cú pháp dưới đây:
@@ -74,3 +72,4 @@ CREATE TABLE detections (
    ```bash
    git clone https://github.com/your-repo/AI_PhanTichLopHoc.git
    cd AI_PhanTichLopHoc
+2. Chạy file Docker
