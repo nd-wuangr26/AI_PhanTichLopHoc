@@ -6,7 +6,7 @@ from datetime import datetime
 import time
 from flask import jsonify
 from collections import Counter
-from utils.my_model import detect_and_classify
+from my_model import detect_and_classify
 
 app = Flask(__name__)
 camera = cv2.VideoCapture("test.mp4")
@@ -17,7 +17,7 @@ DB_CONFIG = {
     'host': '127.0.0.1',  # Địa chỉ máy chủ MySQL
     'user': 'root',  # Tên người dùng (thay đổi nếu cần)
     'password': '123',  # Mật khẩu (thay đổi)
-    'database': 'class_db'  # Tên database
+    'database': 'AI_monitor'  # Tên database
 }
 
 # Kết nối và trả về connection
